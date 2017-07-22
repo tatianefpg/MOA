@@ -8,12 +8,13 @@ package moa;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.Random;
 
 /**
  *
- * @author Tatiane Paz
+ * @author Tatiane Paz e Pedro Moraes
  */
 public class PMedidas {
 
@@ -21,13 +22,37 @@ public class PMedidas {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        Vetor[] vetorDados = new Vetor[101];
-        int[] medianas = new int[10];
-        lerArquivo(vetorDados);
-        populacaoInicial(vetorDados, medianas);
+        Vertice[] vetorVertice = new Vertice[101];
+        Mediana[] vetorMediana = new Mediana[10];
+        lerArquivo(vetorVertice);
+        populacaoInicial(vetorVertice,vetorMediana);
     }
     
-     public static void lerArquivo(Vetor[] vetorDados) {
+    private static class Mediana{
+        private Vertice mediana;
+        private ArrayList<Vertice> vertices;
+        private int posicao = 0;
+
+        public Vertice getMediana() {
+            return mediana;
+        }
+
+        public void setMediana(Vertice Mediana) {
+            this.mediana = Mediana;
+        }
+
+        public ArrayList<Vertice> getVertices() {
+            return vertices;
+        }
+
+        public void setVertices(ArrayList<Vertice> vertices) {
+            this.vertices = vertices;
+        }
+        
+        
+    }
+    
+     public static void lerArquivo(Vertice[] vetorDados) {
 
         Scanner ler = new Scanner(System.in);
         
@@ -75,7 +100,7 @@ public class PMedidas {
     }
     
     
-    static class Vetor{
+    static class Vertice{
         public static int x = 0;
         public static int y = 0;
         public static int cap = 0;
@@ -95,7 +120,7 @@ public class PMedidas {
         }
 
         public static void setCapLivre(int capLivre) {
-            Vetor.capLivre = capLivre;
+            Vertice.capLivre = capLivre;
         }
         
         public static int getX() {
@@ -103,7 +128,7 @@ public class PMedidas {
         }
 
         public static void setX(int x) {
-            Vetor.x = x;
+            Vertice.x = x;
         }
 
         public static int getY() {
@@ -111,7 +136,7 @@ public class PMedidas {
         }
 
         public static void setY(int y) {
-            Vetor.y = y;
+            Vertice.y = y;
         }
 
         public static int getCap() {
@@ -119,7 +144,7 @@ public class PMedidas {
         }
 
         public static void setCap(int cap) {
-            Vetor.cap = cap;
+            Vertice.cap = cap;
         }
 
         public static int getDem() {
@@ -127,7 +152,7 @@ public class PMedidas {
         }
 
         public static void setDem(int dem) {
-            Vetor.dem = dem;
+            Vertice.dem = dem;
         }
 
         public static int getnVertices() {
@@ -135,7 +160,7 @@ public class PMedidas {
         }
 
         public static void setnVertices(int nVertices) {
-            Vetor.nVertices = nVertices;
+            Vertice.nVertices = nVertices;
         }
 
         public static int getnMedianas() {
@@ -143,7 +168,7 @@ public class PMedidas {
         }
 
         public static void setnMedianas(int nMedianas) {
-            Vetor.nMedianas = nMedianas;
+            Vertice.nMedianas = nMedianas;
         }
 
         public static boolean isEstado() {
@@ -151,7 +176,7 @@ public class PMedidas {
         }
 
         public static void setEstado(boolean estado) {
-            Vetor.estado = estado;
+            Vertice.estado = estado;
         }
 
         public static boolean isMediana() {
@@ -159,12 +184,12 @@ public class PMedidas {
         }
 
         public static void setMediana(boolean mediana) {
-            Vetor.mediana = mediana;
+            Vertice.mediana = mediana;
         }
         
     }
     
-    public static void populacaoInicial(Vetor[] vetorDados, int[] medianas){
+    public static void populacaoInicial(Vertice[] vetorDados,Mediana[] vetorMediana){
         
         //instância um objeto da classe Random usando o construtor básico
 	Random gerador = new Random();
@@ -180,54 +205,69 @@ public class PMedidas {
             while(numero == 0)
                 numero = gerador.nextInt(100);
             //Alterado o atributo mediana para true
-            vetorDados[numero].mediana = true;
-            //Altera sua capacidadeLivre
-            vetorDados[numero].capLivre = (vetorDados[numero].cap - vetorDados[numero].dem);
-            //imprime o numero sorteado e o campo mediana para verificacao
-            System.out.printf("numero: %d -> ",numero);
-            System.out.println(vetorDados[numero].mediana);
-            //salva no vetor medianas os numeros sortidos
-            medianas[i] = numero;
+            if(!vetorDados[numero].mediana){
+                
+                vetorDados[numero].mediana = true;
+                //Altera sua capacidadeLivre
+                vetorDados[numero].capLivre = (vetorDados[numero].cap - vetorDados[numero].dem);
+                //imprime o numero sorteado e o campo mediana para verificacao
+                System.out.printf("numero: %d -> ",numero);
+                System.out.println(vetorDados[numero].mediana);
+                //salva no vetor medianas os numeros sortidos
+
+                vetorMediana[i].posicao = numero;
+                vetorMediana[i].mediana = vetorDados[numero];
+            }
 	}
+        
         int posicao = 1;
         double distancia;
         int x ;
         int y;
+        boolean verifica = true;
         int bestMediana = 0;
         double bestDistancia = 0; //ARRUMAR POIS A MELHOR DISTANCIA N PODE SER 0
         
         //gera a distancia do vertice para a mediana
         while(posicao < 101){
             //verifica se o vertice e mediana
-            if(vetorDados[posicao].mediana == true)
+            if(vetorDados[posicao].mediana)
                 posicao ++;
             //se o vertice não for mediana,calcula a distancia para todas as medianas
             else{
                 for(int j = 0; j < vetorDados[0].nMedianas;j++){
                     
                     //Verificar se a mediana tem capacidade
-                    if(vetorDados[medianas[j]].capLivre >= vetorDados[posicao].dem ){
+                    if(vetorDados[vetorMediana[j].posicao].capLivre >= vetorDados[posicao].dem ){
                         
                         //mediana - vertice
-                        x = Math.abs(vetorDados[medianas[j]].x - vetorDados[posicao].x);
-                        y = Math.abs(vetorDados[medianas[j]].y - vetorDados[posicao].y);
+                        x = Math.abs(vetorDados[vetorMediana[j].posicao].x - vetorDados[posicao].x);
+                        y = Math.abs(vetorDados[vetorMediana[j].posicao].y - vetorDados[posicao].y);
                         //distancia = raiz(pow(x2 - x2) + pow(y2 - y1) );
                         distancia = Math.sqrt(Math.pow(x,2) + Math.pow(y,2));
-
+                        
+                        //Verifica se a bestDistancia já recebeu algum valor
+                        if(verifica){
+                            //Atribui valor inicial para a bestDistancia
+                            bestDistancia = distancia;
+                            verifica = false;
+                        }
                         //se a distancia calculada for melhor do que a bestDistancia
                         if(distancia < bestDistancia){
                             //atualizo a melhor distancia
                             bestDistancia = distancia;
                             //salvo sua mediana
-                            bestMediana = medianas[j];
+                            bestMediana = vetorMediana[j].posicao;
                         }
-                        //FAZER!! Adicionar o vertice a mediana
+                        //Adicionar o vertice a mediana
+                        vetorMediana[j].vertices.add(vetorDados[posicao]);
+                        
                     }
                     //Se não tiver capacidade passar para a proxima melhor
                     
                     //colocar o vertice na mediana de menor distancia q possui capacidade
-                    //vetorDados[medianas[j]].capLivre = (vetorDados[medianas[j]].capLivre 
-                    //                                        - vetorDados[posicao].dem); 
+                    //vetorDados[vetorMediana[j].posicao].capLivre = (vetorVertice[vetorMediana[j].posicao].capLivre 
+                    //                                        - vetorVertice[posicao].dem); 
                 }
                 posicao ++;
             }
