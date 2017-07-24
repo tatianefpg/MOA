@@ -30,7 +30,7 @@ class Main {
     
     //private static final int[][] TESTE1 = new int[][]{{2, 1, 5, 9},{3, 6, 10, 13},{4, 7, 11, 14},{0, 8, 12, 15}};
     private static final int[][] TESTE1 = new int[][]{{5, 13, 6, 10},{1, 7, 2, 9}, {4, 3, 15, 14}, {8, 0, 11, 12}};
-    private static class Registro implements Comparable<Registro>{
+    private static class Registro implements Comparable<Registro>{  
         
         private int[][] matriz = new int[4][4];
         private int f = 0;
