@@ -238,39 +238,49 @@ public class PMedidas {
                 //medianas[i] = numero;
             }
 	}
+        
         int posicao = 1;
         double distancia;
         int x ;
         int y;
+        boolean verifica = true;
         int bestMediana = 0;
         double bestDistancia = 0; //ARRUMAR POIS A MELHOR DISTANCIA N PODE SER 0
         
         //gera a distancia do vertice para a mediana
         while(posicao < 101){
             //verifica se o vertice e mediana
-            if(vetorDados[posicao].mediana == true)
+            if(vetorDados[posicao].mediana)
                 posicao ++;
             //se o vertice não for mediana,calcula a distancia para todas as medianas
             else{
                 for(int j = 0; j < vetorDados[0].nMedianas;j++){
                     
                     //Verificar se a mediana tem capacidade
-                    if(vetorDados[medianas[j]].capLivre >= vetorDados[posicao].dem ){
+                    if(vetorDados[vetorMediana[j].posicao].capLivre >= vetorDados[posicao].dem ){
                         
                         //mediana - vertice
-                        x = Math.abs(vetorDados[medianas[j]].x - vetorDados[posicao].x);
-                        y = Math.abs(vetorDados[medianas[j]].y - vetorDados[posicao].y);
+                        x = Math.abs(vetorDados[vetorMediana[j].posicao].x - vetorDados[posicao].x);
+                        y = Math.abs(vetorDados[vetorMediana[j].posicao].y - vetorDados[posicao].y);
                         //distancia = raiz(pow(x2 - x2) + pow(y2 - y1) );
                         distancia = Math.sqrt(Math.pow(x,2) + Math.pow(y,2));
-
+                        
+                        //Verifica se a bestDistancia já recebeu algum valor
+                        if(verifica){
+                            //Atribui valor inicial para a bestDistancia
+                            bestDistancia = distancia;
+                            verifica = false;
+                        }
                         //se a distancia calculada for melhor do que a bestDistancia
                         if(distancia < bestDistancia){
                             //atualizo a melhor distancia
                             bestDistancia = distancia;
                             //salvo sua mediana
-                            bestMediana = medianas[j];
+                            bestMediana = vetorMediana[j].posicao;
                         }
-                        //FAZER!! Adicionar o vertice a mediana
+                        //Adicionar o vertice a mediana
+                        vetorMediana[j].vertices.add(vetorDados[posicao]);
+                        
                     }
                     //Se não tiver capacidade passar para a proxima melhor
                     
