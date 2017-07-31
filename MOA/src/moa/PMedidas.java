@@ -12,7 +12,7 @@ import java.util.Random;
 /**
  * @author Tatiane Paz e Pedro Moraes
  */
-public class PMedidas {
+class PMedidas {
 
     /**
      * @param args the command line arguments
@@ -20,20 +20,20 @@ public class PMedidas {
     
     private static int numeroMedianas = 0;
     private static int numeroVertices = 0;
-    
+   
     public static void main(String[] args) {
         abrirArquivo();
     }
     
     private static class Vertice{
-        public static int x;
-        public static int y;
-        public static int cap;
-        public static int dem;
-        public static int posicao;
-        public static int capLivre;  
-        public static boolean estado;
-        public static boolean mediana;
+        private int x;
+        private int y;
+        private int cap;
+        private int dem;
+        private int posicao;
+        private int capLivre;  
+        private boolean estado;
+        private boolean mediana;
         // estado = 0 -> nao visitado
         // estado = 1 -> visitado  
         // mediana = 0 -> nao e mediana
@@ -107,6 +107,7 @@ public class PMedidas {
     private static class Mediana{
         private int posicao;
         private Vertice mediana;
+        private int posicaoMediana;
         private ArrayList<Vertice> vertices;
 
         public int getPosicao() {
@@ -126,7 +127,16 @@ public class PMedidas {
         }
         public void setVertices(ArrayList<Vertice> vertices) {
             this.vertices = vertices;
-        }     
+        }   
+
+        public int getPosicaoMediana() {
+            return posicaoMediana;
+        }
+
+        public void setPosicaoMediana(int posicaoMediana) {
+            this.posicaoMediana = posicaoMediana;
+        }
+        
     }
     
     private static void abrirArquivo(){
@@ -137,12 +147,11 @@ public class PMedidas {
         System.out.printf("Digite o arquivo: ");
         
         int arquivo = ler.nextInt(); 
-        numeroVertices = arquivo;
-        
+        numeroVertices = arquivo;      
         arquivo = ler.nextInt();
         numeroMedianas = arquivo;
         
-        Vertice vertice = new Vertice();
+        Vertice vertice;
         ArrayList<Vertice> vertices = new ArrayList<>();
         
         
@@ -150,7 +159,8 @@ public class PMedidas {
         System.out.println("Numero de Medianas: " + numeroMedianas);
         
         while(contador < numeroVertices){
-   
+            
+            vertice = new Vertice();
             arquivo = ler.nextInt();
             vertice.setX(arquivo);
             arquivo = ler.nextInt();
@@ -161,108 +171,80 @@ public class PMedidas {
             vertice.setDem(arquivo);
             vertice.setPosicao(contador);
             vertices.add(contador, vertice);
+            
+            System.out.println("Pos: " + contador +
+                               "\tX: " + vertice.getX() +
+                               "\tY: " + vertice.getY() +
+                               "\tCap: " + vertice.getCap() +
+                               "\tDem: " + vertice.getDem());
+
             contador++;
-            System.out.println(vertice.getPosicao());
-        }
-        
-        //populacaoInicial(vertices);
+            if(contador == numeroVertices)
+                criaMedianas(vertices);     
+        }      
     }
     
-    /*public static void lerArquivo(Vertice[] vetorDados) {
-
-        Scanner ler = new Scanner(System.in);
-        
-        System.out.printf("Digite o arquivo: ");
-        int arquivo = ler.nextInt();
-
-        int posicao = 0;
-        
-        //Le o 1 dado da 1 linha e armazena o dado na sua respectiva variavel
-        vetorDados[posicao].nVertices = arquivo;
-        //imprime o dado para verificacao
-        System.out.printf("nº vertices[%d]: %d\n",posicao,vetorDados[posicao].nVertices);
-        
-        //Le o 2 dado da 1 linha e armazena o dado na sua respectiva variavel
-        arquivo = ler.nextInt();
-        vetorDados[posicao].nMedianas = arquivo;
-        //imprime o dado para teste
-        System.out.printf("nº medianas[%d]: %d\n",posicao,vetorDados[posicao].nMedianas);
-        
-        //le a segunda linha ate a ultima linha -> "vetor vai 1 até 100"
-        for(posicao = 1; posicao < 101; posicao++){
-            //le o 1 dado da linha e armazena o dado na sua respectiva variavel
-            arquivo = ler.nextInt();
-            vetorDados[posicao].x = arquivo;
-            //imprime o dado para verificacao
-            System.out.printf("x[%d]: %d\n",posicao,vetorDados[posicao].x);
-            //le o 2 dado da linha e armazena o dado na sua respectiva variavel
-            arquivo = ler.nextInt();
-            vetorDados[posicao].y = arquivo;
-            //imprime o dado para verificacao
-            System.out.printf("y[%d]: %d\n",posicao,vetorDados[posicao].y);
-            //le o 3 dado da linha e armazena o dado na sua respectiva variavel
-            arquivo = ler.nextInt();
-            vetorDados[posicao].cap = arquivo;
-            //imprime o dado para verificacao
-            System.out.printf("cap[%d]: %d\n",posicao,vetorDados[posicao].cap);
-            //le o 4 dado da linha e armazena o dado na sua respectiva variavel
-            arquivo = ler.nextInt();
-            vetorDados[posicao].dem = arquivo;
-            //imprime o dado para verificacao
-            System.out.printf("dem[%d]: %d\n",posicao,vetorDados[posicao].dem);
-        }
-        
-        System.out.println();
-    }*/
-      
-    
-    /*private static void populacaoInicial(Vertice[] vertices){
-        
+    private static void criaMedianas(ArrayList<Vertice> vertices){
         //instância um objeto da classe Random usando o construtor básico
 	Random gerador = new Random();
+        Mediana mediana;
+        ArrayList<Mediana> medianas;
+        medianas = new ArrayList<>();
+        int contador = 0;
 	int numero;
+        
 	//imprime sequência de 10 números inteiros aleatórios entre 0 e 25
-	for (int i = 0; i < numeroMedianas; i++) {
+        while(contador < numeroMedianas) {
             //imprime os numeros sorteados para verificacao
             //System.out.println(gerador.nextInt(100));
-            numero = gerador.nextInt(100);
+            numero = gerador.nextInt(99);
+            //System.out.println(numero);
             //Alterado o atributo mediana para true
-            if(!vertices[numero].mediana){
-                vertices[numero].mediana = true;
+            //System.out.println(vertices.get(numero).isMediana());
+            if(!vertices.get(numero).isMediana()){
+                
+                mediana = new Mediana();
+                vertices.get(numero).setMediana(true);
                 //Altera sua capacidadeLivre
-                vertices[numero].capLivre = (vertices[numero].cap - vertices[numero].dem);
+                vertices.get(numero).setCapLivre(vertices.get(numero).getCap() - 
+                                                 vertices.get(numero).getDem());
                 //imprime o numero sorteado e o campo mediana para verificacao
-                System.out.printf("numero: %d -> ",numero);
-                System.out.println(vertices[numero].mediana);
-                //salva no vetor medianas os numeros sortidos
-                //medianas[i] = numero;
+                System.out.printf("numero: " + numero + " --> ");
+                System.out.println(vertices.get(numero).isMediana() + 
+                                  "\tCap Livre: " + vertices.get(numero).getCapLivre());
+                
+                mediana.setPosicao(numero);
+                mediana.setMediana(vertices.get(numero));
+                mediana.setPosicaoMediana(contador);
+                medianas.add(contador, mediana);
+                //System.out.println(medianas.get(contador).getPosicao());
+                contador++;
             }
-	}
+	}    
+        populacaoInicial(vertices, medianas);
+    }
+    
+    private static void populacaoInicial(ArrayList<Vertice> vertices, ArrayList<Mediana> medianas){
         
-        int posicao = 1;
-        double distancia;
-        int x ;
+        int x;
         int y;
+        int posicao = 0;
+        double distancia;
+        double bestDistancia;
         boolean verifica = true;
-        int bestMediana = 0;
-        double bestDistancia = 0; //ARRUMAR POIS A MELHOR DISTANCIA N PODE SER 0
         
         //gera a distancia do vertice para a mediana
-        while(posicao < 101){
+        while(posicao < numeroVertices){
             //verifica se o vertice e mediana
-            if(vetorDados[posicao].mediana)
-                posicao ++;
+            if(vertices.get(posicao).isMediana()) posicao++;
             //se o vertice não for mediana,calcula a distancia para todas as medianas
             else{
-                for(int j = 0; j < vetorDados[0].nMedianas;j++){
+                for(int m = 0; m < numeroMedianas; m++){
                     
                     //Verificar se a mediana tem capacidade
-                    if(vetorDados[vetorMediana[j].posicao].capLivre >= vetorDados[posicao].dem ){
-                        
-                        //mediana - vertice
-                        x = Math.abs(vetorDados[vetorMediana[j].posicao].x - vetorDados[posicao].x);
-                        y = Math.abs(vetorDados[vetorMediana[j].posicao].y - vetorDados[posicao].y);
-                        //distancia = raiz(pow(x2 - x2) + pow(y2 - y1) );
+                    if(medianas.get(m).getMediana().getCapLivre() >= vertices.get(posicao).getDem()){      
+                        x = medianas.get(m).getMediana().getX() - vertices.get(posicao).getX();
+                        y = medianas.get(m).getMediana().getY() - vertices.get(posicao).getY();
                         distancia = Math.sqrt(Math.pow(x,2) + Math.pow(y,2));
                         
                         //Verifica se a bestDistancia já recebeu algum valor
@@ -272,26 +254,17 @@ public class PMedidas {
                             verifica = false;
                         }
                         //se a distancia calculada for melhor do que a bestDistancia
-                        if(distancia < bestDistancia){
+                        //if(distancia < bestDistancia){
                             //atualizo a melhor distancia
-                            bestDistancia = distancia;
-                            //salvo sua mediana
-                            bestMediana = vetorMediana[j].posicao;
-                        }
-                        //Adicionar o vertice a mediana
-                        vetorMediana[j].vertices.add(vetorDados[posicao]);
-                        
+                        //    bestDistancia = distancia;
+                            //salvo posicao da sua mediana
+                        //    bestMediana = m;
+                        //}               
                     }
-                    //Se não tiver capacidade passar para a proxima melhor
-                    
-                    //colocar o vertice na mediana de menor distancia q possui capacidade
-                    //vetorDados[medianas[j]].capLivre = (vetorVertices[medianas[j]].capLivre 
-                    //                                        - vetorVertices[posicao].dem); 
                 }
                 posicao ++;
             }
-        }//Levar em consideracao para os proximos testes q não consiga colocar 
-         //todos osvertices nas medianas (penalizar conjunto de medianas escolhidas)
-    }*/
+        }
+    }
     
 }
