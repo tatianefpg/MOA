@@ -20,13 +20,54 @@ class PMedidas {
     
     private static int numeroMedianas = 0;
     private static int numeroVertices = 0;
-   
+    private static int posMediana = -1;
+    private static double bestDistancia = -1;
+    private static double distanciaTotal = 0;
+    
     public static void main(String[] args) {
+        /*ArrayList<Vertice> v = new ArrayList<>();
+        numeroMedianas = 1;
+        numeroVertices = 3;
+        Vertice v1 = new Vertice();
+        v1.setX(409154);
+        v1.setY(435528);
+        v1.setCap(720);
+        v1.setDem(50);
+        v.add(0, v1);
+        Vertice v2 = new Vertice();
+        v2.setX(409151);
+        v2.setY(435683);
+        v2.setCap(720);
+        v2.setDem(4);
+        v.add(1, v2);
+        Vertice v3 = new Vertice();
+        v3.setX(409277);
+        v3.setY(435420);
+        v3.setCap(720);
+        v3.setDem(33);
+        v.add(2, v3);
+        
+        ArrayList<Mediana> m = new ArrayList<>();
+        Mediana m1 = new Mediana();
+        m1.setMediana(v2);
+        m1.setPosicao(1);
+        m1.setPosicaoMediana(0);
+        m1.getMediana().setCapLivre(v2.getCap() - v2.getDem());
+        m1.getMediana().setMediana(true);
+        m.add(0, m1);
+        populacaoInicial(v, m);
+        System.out.println(m.get(0).getVertices().get(0).getX());
+        System.out.println(m.get(0).getVertices().get(1).getX());
+        System.out.println(m.get(0).getTotalDistancia());
+        System.out.println(v1.isEstado());
+        System.out.println(v2.isMediana());
+        System.out.println(v3.isEstado());
+        System.out.println(m.get(0).getMediana().getCapLivre());*/
         abrirArquivo();
     }
     
     private static class Vertice{
-        private int x;
+        private int x; 
         private int y;
         private int cap;
         private int dem;
@@ -108,7 +149,8 @@ class PMedidas {
         private int posicao;
         private Vertice mediana;
         private int posicaoMediana;
-        private ArrayList<Vertice> vertices;
+        private double totalDistancia = 0;
+        private ArrayList<Vertice> vertices = new ArrayList<>();
 
         public int getPosicao() {
             return posicao;
@@ -137,6 +179,17 @@ class PMedidas {
             this.posicaoMediana = posicaoMediana;
         }
         
+        public void adicionaVertice(Vertice vertice){
+            this.vertices.add(vertice);
+        }
+
+        public double getTotalDistancia() {
+            return totalDistancia;
+        }
+
+        public void setTotalDistancia(double totalDistancia) {
+            this.totalDistancia = totalDistancia;
+        }          
     }
     
     private static void abrirArquivo(){
@@ -146,20 +199,20 @@ class PMedidas {
         
         System.out.printf("Digite o arquivo: ");
         
-        int arquivo = ler.nextInt(); 
+        int arquivo = ler.nextInt(); //adiciona numero de vertices 
         numeroVertices = arquivo;      
-        arquivo = ler.nextInt();
+        arquivo = ler.nextInt(); //adiciona numero de medianas
         numeroMedianas = arquivo;
         
         Vertice vertice;
         ArrayList<Vertice> vertices = new ArrayList<>();
         
         
-        System.out.println("Numero de vertices: " + numeroVertices);
-        System.out.println("Numero de Medianas: " + numeroMedianas);
+        //System.out.println("Numero de vertices: " + numeroVertices);
+        //System.out.println("Numero de Medianas: " + numeroMedianas);
         
-        while(contador < numeroVertices){
-            
+        //atribui para cada vertices a pos X e Y, a capacidade e a demanda e adiciona numa lista
+        while(contador < numeroVertices){    
             vertice = new Vertice();
             arquivo = ler.nextInt();
             vertice.setX(arquivo);
@@ -172,14 +225,15 @@ class PMedidas {
             vertice.setPosicao(contador);
             vertices.add(contador, vertice);
             
-            System.out.println("Pos: " + contador +
+            /*System.out.println("Pos: " + contador +
                                "\tX: " + vertice.getX() +
                                "\tY: " + vertice.getY() +
                                "\tCap: " + vertice.getCap() +
-                               "\tDem: " + vertice.getDem());
+                               "\tDem: " + vertice.getDem());*/
 
             contador++;
             if(contador == numeroVertices)
+                //chama a funcao para criar as medias
                 criaMedianas(vertices);     
         }      
     }
@@ -193,16 +247,14 @@ class PMedidas {
         int contador = 0;
 	int numero;
         
-	//imprime sequência de 10 números inteiros aleatórios entre 0 e 25
+	//transforma vertices aleatorios em medias ate o total de medianas pedidas
         while(contador < numeroMedianas) {
-            //imprime os numeros sorteados para verificacao
-            //System.out.println(gerador.nextInt(100));
-            numero = gerador.nextInt(99);
+            //Sorteia um vertice dentro da lista de vertices
+            numero = gerador.nextInt(numeroVertices - 1);
             //System.out.println(numero);
-            //Alterado o atributo mediana para true
-            //System.out.println(vertices.get(numero).isMediana());
+            //verifica se o vertice sorteado já é mediana
             if(!vertices.get(numero).isMediana()){
-                
+                //transforma em mediana
                 mediana = new Mediana();
                 vertices.get(numero).setMediana(true);
                 //Altera sua capacidadeLivre
@@ -213,6 +265,7 @@ class PMedidas {
                 System.out.println(vertices.get(numero).isMediana() + 
                                   "\tCap Livre: " + vertices.get(numero).getCapLivre());
                 
+                //atribui a medina a uma lista de medianas
                 mediana.setPosicao(numero);
                 mediana.setMediana(vertices.get(numero));
                 mediana.setPosicaoMediana(contador);
@@ -221,50 +274,58 @@ class PMedidas {
                 contador++;
             }
 	}    
+        //chama a funcao que cria a populacao inicial
         populacaoInicial(vertices, medianas);
     }
-    
+        
     private static void populacaoInicial(ArrayList<Vertice> vertices, ArrayList<Mediana> medianas){
         
-        int x;
-        int y;
-        int posicao = 0;
+        int x, y;
         double distancia;
-        double bestDistancia;
-        boolean verifica = true;
         
-        //gera a distancia do vertice para a mediana
-        while(posicao < numeroVertices){
-            //verifica se o vertice e mediana
-            if(vertices.get(posicao).isMediana()) posicao++;
-            //se o vertice não for mediana,calcula a distancia para todas as medianas
-            else{
+        for(int i = 0; i < numeroVertices; i++){
+            //verifica cada vertice para ver qual nao é mediana
+            if(!vertices.get(i).isMediana()){
                 for(int m = 0; m < numeroMedianas; m++){
-                    
-                    //Verificar se a mediana tem capacidade
-                    if(medianas.get(m).getMediana().getCapLivre() >= vertices.get(posicao).getDem()){      
-                        x = medianas.get(m).getMediana().getX() - vertices.get(posicao).getX();
-                        y = medianas.get(m).getMediana().getY() - vertices.get(posicao).getY();
+                    //para cada mediana pega o vertice seleciona e verifica qual fica com a melhor distancia
+                    if(medianas.get(m).getMediana().getCapLivre() >= vertices.get(i).getDem()){
+                        x = medianas.get(m).getMediana().getX() - vertices.get(i).getX();
+                        y = medianas.get(m).getMediana().getY() - vertices.get(i).getY();
                         distancia = Math.sqrt(Math.pow(x,2) + Math.pow(y,2));
-                        
-                        //Verifica se a bestDistancia já recebeu algum valor
-                        if(verifica){
-                            //Atribui valor inicial para a bestDistancia
+                    
+                        if(m == 0){
                             bestDistancia = distancia;
-                            verifica = false;
+                            posMediana = m;
+                        }else if(bestDistancia > distancia){
+                            bestDistancia = distancia;
+                            posMediana = m;
                         }
-                        //se a distancia calculada for melhor do que a bestDistancia
-                        //if(distancia < bestDistancia){
-                            //atualizo a melhor distancia
-                        //    bestDistancia = distancia;
-                            //salvo posicao da sua mediana
-                        //    bestMediana = m;
-                        //}               
-                    }
+                    } 
                 }
-                posicao ++;
+                //atribui o vertice com menor distancia para aquela mediana
+                medianas.get(posMediana).adicionaVertice(vertices.get(i));
+                //adiciona ao total da distancia da mediana a distancia daquele vertice
+                medianas.get(posMediana).setTotalDistancia(medianas.get(posMediana).getTotalDistancia()
+                                                           + bestDistancia);
+                //decrementa a capacidade livre da mediana
+                medianas.get(posMediana).getMediana().setCapLivre(medianas.get(posMediana).getMediana().getCapLivre()
+                                                                  - vertices.get(i).getDem());
+                //marca o vertice como já utilizado
+                vertices.get(i).setEstado(true);
             }
         }
-    }
-    
+        
+        for(int v = 0; v < numeroVertices; v++){
+            if(!vertices.get(v).isMediana())
+                System.out.println("Vet: " + vertices.get(v).isEstado());
+            else{
+                System.out.println("Med: " + vertices.get(v).isMediana());
+            }
+        }
+        for(int m = 0; m < numeroMedianas; m++){
+            System.out.println(medianas.get(m).getMediana().getCapLivre());
+            distanciaTotal = distanciaTotal + medianas.get(m).getTotalDistancia();
+        }
+        System.out.println("Dist: " + distanciaTotal);
+    }   
 }
