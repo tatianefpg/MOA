@@ -261,9 +261,9 @@ class PMedidas {
                 vertices.get(numero).setCapLivre(vertices.get(numero).getCap() - 
                                                  vertices.get(numero).getDem());
                 //imprime o numero sorteado e o campo mediana para verificacao
-                System.out.printf("numero: " + numero + " --> ");
-                System.out.println(vertices.get(numero).isMediana() + 
-                                  "\tCap Livre: " + vertices.get(numero).getCapLivre());
+                //System.out.printf("numero: " + numero + " --> ");
+                //System.out.println(vertices.get(numero).isMediana() + 
+                //                  "\tCap Livre: " + vertices.get(numero).getCapLivre());
                 
                 //atribui a medina a uma lista de medianas
                 mediana.setPosicao(numero);
@@ -302,30 +302,64 @@ class PMedidas {
                         }
                     } 
                 }
-                //atribui o vertice com menor distancia para aquela mediana
-                medianas.get(posMediana).adicionaVertice(vertices.get(i));
-                //adiciona ao total da distancia da mediana a distancia daquele vertice
-                medianas.get(posMediana).setTotalDistancia(medianas.get(posMediana).getTotalDistancia()
-                                                           + bestDistancia);
-                //decrementa a capacidade livre da mediana
-                medianas.get(posMediana).getMediana().setCapLivre(medianas.get(posMediana).getMediana().getCapLivre()
-                                                                  - vertices.get(i).getDem());
-                //marca o vertice como já utilizado
-                vertices.get(i).setEstado(true);
+                //verfica se o vertice realmente cabe na mediana
+                if(medianas.get(posMediana).getMediana().getCapLivre() >= vertices.get(i).getDem()){
+                    //atribui o vertice com menor distancia para aquela mediana
+                    medianas.get(posMediana).adicionaVertice(vertices.get(i));
+                    //adiciona ao total da distancia da mediana a distancia daquele vertice
+                    medianas.get(posMediana).setTotalDistancia(medianas.get(posMediana).getTotalDistancia()
+                                                               + bestDistancia);
+                    //decrementa a capacidade livre da mediana
+                    medianas.get(posMediana).getMediana().setCapLivre(medianas.get(posMediana).getMediana().getCapLivre()
+                                                                      - vertices.get(i).getDem());
+                    //marca o vertice como já utilizado
+                    vertices.get(i).setEstado(true);
+                }
             }
         }
         
+        //verifica quais vertices não entraram em mediana
         for(int v = 0; v < numeroVertices; v++){
             if(!vertices.get(v).isMediana())
-                System.out.println("Vet: " + vertices.get(v).isEstado());
-            else{
-                System.out.println("Med: " + vertices.get(v).isMediana());
-            }
+                if(!vertices.get(v).isEstado()){
+                    //System.out.println("Pos: " + v + " Estado: " + vertices.get(v).isEstado());
+                    //chama funcao  parav adicionalos
+                    adicionaVertice(vertices, medianas, v);
+                }
         }
+        //printa todas as medianas com seus vertices sua capacidade livre e a distancia total final
         for(int m = 0; m < numeroMedianas; m++){
-            System.out.println(medianas.get(m).getMediana().getCapLivre());
+            System.out.print("Med: " + medianas.get(m).getPosicao());
+            for(Vertice v: medianas.get(m).getVertices()){
+                //System.out.print("\tPos: " + v.getPosicao());
+            }
+            System.out.println("\nCap Livre: " + medianas.get(m).getMediana().getCapLivre());
             distanciaTotal = distanciaTotal + medianas.get(m).getTotalDistancia();
         }
         System.out.println("Dist: " + distanciaTotal);
-    }   
+    }
+    
+    //funcao para verricar se o vertice que sobrou cabe em alguma mediana 
+    //pega a primeira q couber o vertice
+    private static void adicionaVertice(ArrayList<Vertice> vertices, ArrayList<Mediana> medianas, int pos){
+        for(Mediana m: medianas){
+            if((m.getMediana().getCapLivre() >= vertices.get(pos).getDem()) && !vertices.get(pos).isEstado()){
+                m.adicionaVertice(vertices.get(pos));
+                m.setTotalDistancia(m.getTotalDistancia() + 
+                        calculaDistancia(m.getMediana().getX(), m.getMediana().getY(), 
+                                vertices.get(pos).getX(), vertices.get(pos).getY()));
+                m.getMediana().setCapLivre(m.getMediana().getCapLivre() - 
+                        vertices.get(pos).getDem());
+                vertices.get(pos).setEstado(true);  
+            }
+        }
+        System.out.println("Vertice sobrou: " + vertices.get(pos).isEstado());
+    }
+    
+    //calcula distancia de dois vertices
+    private static double calculaDistancia(int x1, int y1, int x2, int y2){
+        int x = x1 - x2;
+        int y = y1 - y2;
+        return Math.sqrt(Math.pow(x,2) + Math.pow(y,2));
+    }
 }
